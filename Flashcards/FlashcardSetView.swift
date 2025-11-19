@@ -12,7 +12,8 @@ struct FlashcardSetView: View {
     
     @State private var index = 0
     @State private var showingAnswer = false
-    
+    @State private var dragAmount: CGFloat = 0
+
     func addCard(question: String, answer: String) {
         flashcardSet.cards.append(
             Flashcard(id: UUID(), question: question, answer: answer)
@@ -42,6 +43,41 @@ struct FlashcardSetView: View {
                         .padding()
                 }
                 .frame(height: 200)
+                .offset(x: dragAmount)   // <-- card visually moves
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            dragAmount = value.translation.width
+                        }
+                        .onEnded { value in
+                            let threshold: CGFloat = 100
+                            
+                            // Swipe left → next card
+                            if value.translation.width < -threshold {
+                                if index < flashcardSet.cards.count - 1 {
+                                    withAnimation {
+                                        index += 1
+                                        showingAnswer = false
+                                    }
+                                }
+                            }
+                            
+                            // Swipe right → previous card
+                            else if value.translation.width > threshold {
+                                if index > 0 {
+                                    withAnimation {
+                                        index -= 1
+                                        showingAnswer = false
+                                    }
+                                }
+                            }
+                            
+                            // Reset card position
+                            withAnimation {
+                                dragAmount = 0
+                            }
+                        }
+                )
                 .onTapGesture {
                     withAnimation {
                         showingAnswer.toggle()
@@ -50,6 +86,7 @@ struct FlashcardSetView: View {
             }
         }
         .navigationTitle(flashcardSet.title)
+        
+        Text("\(index + 1)/\(flashcardSet.cards.count)")
     }
 }
-

@@ -118,7 +118,15 @@ struct FlashcardSetView: View {
         }
         .sheet(isPresented: $showingEditCard) {
             if let i = cardToEditIndex {
-                EditFlashcardView(card: $flashcardSet.cards[i])
+                EditFlashcardView(
+                    card: $flashcardSet.cards[i],
+                    onDelete: {
+                        flashcardSet.cards.remove(at: i)
+                        if index >= flashcardSet.cards.count {
+                            index = max(0, flashcardSet.cards.count - 1)
+                        }
+                    }
+                )
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

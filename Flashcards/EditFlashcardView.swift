@@ -13,6 +13,7 @@ struct EditFlashcardView: View {
     @Binding var card: Flashcard
     @State private var question: String = ""
     @State private var answer: String = ""
+    var onDelete: () -> Void
 
     var body: some View {
         NavigationStack {
@@ -32,6 +33,15 @@ struct EditFlashcardView: View {
                         dismiss()
                     }
                 }
+                ToolbarItem(placement: .bottomBar) {
+                    Button(role: .destructive) {
+                        onDelete()
+                        dismiss()
+                    } label: {
+                        Text("Delete")
+                    }
+                }
+
             }
         }
         .onAppear {

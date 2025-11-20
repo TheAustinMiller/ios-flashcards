@@ -14,6 +14,8 @@ struct FlashcardSetView: View {
     @State private var showingAnswer = false
     @State private var dragAmount: CGFloat = 0
     @State private var showingAddCard = false
+    @State private var showingEditCard = false
+    @State private var cardToEditIndex: Int? = nil
 
     func addCard(question: String, answer: String) {
         flashcardSet.cards.append(
@@ -35,9 +37,12 @@ struct FlashcardSetView: View {
                 let card = flashcardSet.cards[index]
                 
                 ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(.white)
-                        .shadow(radius: 4)
+                    Color(.systemGray6)
+                            .ignoresSafeArea()
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(Color.white)
+                        .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+                        .shadow(color: .white.opacity(0.7), radius: 8, x: -4, y: -4)
                     
                     Text(showingAnswer ? card.answer : card.question)
                         .font(.title)
@@ -84,6 +89,16 @@ struct FlashcardSetView: View {
                         showingAnswer.toggle()
                     }
                 }
+                .onLongPressGesture {
+                    cardToEditIndex = index
+                    showingEditCard = true
+                }
+                .rotationEffect(.degrees(Double(dragAmount / 20)))
+            }
+            if flashcardSet.cards.count > 0 {
+                Text("\(index + 1)/\(flashcardSet.cards.count)")
+            } else {
+                Text("Create a flashcard to start")
             }
         }
         .navigationTitle(flashcardSet.title)
@@ -101,12 +116,13 @@ struct FlashcardSetView: View {
                 addCard(question: question, answer: answer)
             }
         }
-
-        if flashcardSet.cards.count > 0 {
-            Text("\(index + 1)/\(flashcardSet.cards.count)")
-        } else {
-            Text("Create a flashcard to start")
+        .sheet(isPresented: $showingEditCard) {
+            if let i = cardToEditIndex {
+                EditFlashcardView(card: $flashcardSet.cards[i])
+            }
         }
-        
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemGray6))
+        .ignoresSafeArea()
     }
 }

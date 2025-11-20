@@ -28,7 +28,8 @@ struct ContentView: View {
             title: "Spanish",
             cards: [
                 Flashcard(id: UUID(), question: "Hola", answer: "Hello"),
-                Flashcard(id: UUID(), question: "Queso", answer: "Cheese")
+                Flashcard(id: UUID(), question: "Queso", answer: "Cheese"),
+                Flashcard(id: UUID(), question: "Aqui, Aye Carumba", answer: "Here, damn")
             ]
         ),
         FlashcardSet(

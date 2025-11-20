@@ -13,6 +13,7 @@ struct FlashcardSetView: View {
     @State private var index = 0
     @State private var showingAnswer = false
     @State private var dragAmount: CGFloat = 0
+    @State private var showingAddCard = false
 
     func addCard(question: String, answer: String) {
         flashcardSet.cards.append(
@@ -86,7 +87,21 @@ struct FlashcardSetView: View {
             }
         }
         .navigationTitle(flashcardSet.title)
-        
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showingAddCard = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $showingAddCard) {
+            AddFlashcardView(setTitle: flashcardSet.title) { question, answer in
+                addCard(question: question, answer: answer)
+            }
+        }
+
         if flashcardSet.cards.count > 0 {
             Text("\(index + 1)/\(flashcardSet.cards.count)")
         } else {

@@ -105,7 +105,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .navigationTitle("Flashcard Sets")
+            .navigationTitle("Flashcards!")
         }
     }
 }

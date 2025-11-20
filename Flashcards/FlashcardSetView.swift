@@ -87,6 +87,11 @@ struct FlashcardSetView: View {
         }
         .navigationTitle(flashcardSet.title)
         
-        Text("\(index + 1)/\(flashcardSet.cards.count)")
+        if flashcardSet.cards.count > 0 {
+            Text("\(index + 1)/\(flashcardSet.cards.count)")
+        } else {
+            Text("Create a flashcard to start")
+        }
+        
     }
 }

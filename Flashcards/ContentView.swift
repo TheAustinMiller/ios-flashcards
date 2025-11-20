@@ -21,7 +21,8 @@ struct FlashcardSet: Identifiable {
 }
 
 struct ContentView: View {
-    
+    @State private var isAddingNewSet: Bool = false
+    @State private var newTitle: String = ""
     @State private var sets: [FlashcardSet] = [
         FlashcardSet(
             id: UUID(),
@@ -50,6 +51,15 @@ struct ContentView: View {
         sets.remove(atOffsets: offsets)
     }
     
+    func addSet() {
+        let trimmed = newTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        
+        sets.append(FlashcardSet(id: UUID(), title: trimmed, cards: []))
+        newTitle = ""
+        isAddingNewSet = false
+    }
+    
     // Body
     var body: some View {
         NavigationStack {
@@ -61,7 +71,39 @@ struct ContentView: View {
                         Text(set.title)
                     }
                 }
-                .onDelete(perform: deleteSet) 
+                .onDelete(perform: deleteSet)
+                
+                if isAddingNewSet {
+                    HStack {
+                        Button {
+                            isAddingNewSet = false
+                        } label: {
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
+                        }
+                        
+                        TextField("New set", text: $newTitle)
+                            .textFieldStyle(.plain)
+                        
+                        Button {
+                            addSet()
+                        } label: {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.green)
+                        }
+                    }
+                } else {
+                    Button {
+                        isAddingNewSet = true
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Image(systemName: "plus")
+                                .foregroundColor(.green)
+                            Spacer()
+                        }
+                    }
+                }
             }
             .navigationTitle("Flashcard Sets")
         }

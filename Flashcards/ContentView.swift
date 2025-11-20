@@ -21,8 +21,7 @@ struct FlashcardSet: Identifiable {
 }
 
 struct ContentView: View {
-    @State private var isAddingNewSet: Bool = false
-    @State private var newTitle: String = ""
+    @State private var showingAddSet = false
     @State private var sets: [FlashcardSet] = [
         FlashcardSet(
             id: UUID(),
@@ -46,21 +45,19 @@ struct ContentView: View {
         )
     ]
     
-    // Delete Function
     func deleteSet(at offsets: IndexSet) {
         sets.remove(atOffsets: offsets)
     }
-    
-    func addSet() {
-        let trimmed = newTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+
+    func addSet(title: String) {
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
-        
-        sets.append(FlashcardSet(id: UUID(), title: trimmed, cards: []))
-        newTitle = ""
-        isAddingNewSet = false
+
+        sets.append(
+            FlashcardSet(id: UUID(), title: trimmed, cards: [])
+        )
     }
     
-    // Body
     var body: some View {
         NavigationStack {
             List {
@@ -72,40 +69,22 @@ struct ContentView: View {
                     }
                 }
                 .onDelete(perform: deleteSet)
-                
-                if isAddingNewSet {
-                    HStack {
-                        Button {
-                            isAddingNewSet = false
-                        } label: {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red)
-                        }
-                        
-                        TextField("New set", text: $newTitle)
-                            .textFieldStyle(.plain)
-                        
-                        Button {
-                            addSet()
-                        } label: {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(.green)
-                        }
-                    }
-                } else {
+            }
+            .navigationTitle("Flashcards!")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        isAddingNewSet = true
+                        showingAddSet = true
                     } label: {
-                        HStack {
-                            Spacer()
-                            Image(systemName: "plus")
-                                .foregroundColor(.green)
-                            Spacer()
-                        }
+                        Image(systemName: "plus")
                     }
                 }
             }
-            .navigationTitle("Flashcards!")
+            .sheet(isPresented: $showingAddSet) {
+                AddSetView { newTitle in
+                    addSet(title: newTitle)
+                }
+            }
         }
     }
 }

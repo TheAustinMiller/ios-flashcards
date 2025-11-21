@@ -8,13 +8,13 @@
 import SwiftUI
 
 // Models
-struct Flashcard: Identifiable {
+struct Flashcard: Identifiable, Codable, Equatable {
     var id: UUID
     var question: String
     var answer: String
 }
 
-struct FlashcardSet: Identifiable {
+struct FlashcardSet: Identifiable, Codable, Equatable {
     var id: UUID
     var title: String
     var cards: [Flashcard]
@@ -45,6 +45,22 @@ struct ContentView: View {
             cards: []
         )
     ]
+    
+    let setsKey = "flashcard_sets"
+
+    func loadData() {
+        if let data = UserDefaults.standard.data(forKey: setsKey) {
+            if let decoded = try? JSONDecoder().decode([FlashcardSet].self, from: data) {
+                sets = decoded
+            }
+        }
+    }
+
+    func saveData() {
+        if let encoded = try? JSONEncoder().encode(sets) {
+            UserDefaults.standard.set(encoded, forKey: setsKey)
+        }
+    }
     
     func deleteSet(at offsets: IndexSet) {
         sets.remove(atOffsets: offsets)
@@ -86,6 +102,10 @@ struct ContentView: View {
                     addSet(title: newTitle)
                 }
             }
+        }
+        .onAppear(perform: loadData)
+        .onChange(of: sets) { oldValue, newValue in
+            saveData()
         }
     }
 }
